@@ -1,0 +1,19 @@
+#!/bin/bash
+
+which xinput 1>/dev/null || (echo "xinput Missing..." && exit -1)
+which notify-send 1>/dev/null || (echo "notify-send Missing..." && exit -1)
+
+
+id_desc=$(echo $(xinput | grep HUAWEI) | sed "s/ /\n/g" | grep id=)
+dev_id=${id_desc##id=}
+
+status_desc=$(xinput list-props ${dev_id} | grep "Device Enabled")
+status=$(echo ${status_desc} | awk '{print $NF}' )
+
+if [ x"${status}" = x"1" ]; then
+	xinput set-prop ${dev_id} "Device Enabled" 0
+	notify-send "TouchPad disabled"
+else
+	xinput set-prop ${dev_id} "Device Enabled" 1
+	notify-send "TouchPad enabled"
+fi
